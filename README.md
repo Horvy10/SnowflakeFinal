@@ -47,7 +47,8 @@ Použité staging tabuľky:
 
 Tieto tabuľky predstavujú relačný model s väzbami medzi entitami (zákazník, produkt, obchod, dátum a predaj).
 
-> ERD diagram pôvodnej štruktúry je uložený v priečinku `/img/erd.png`.
+<img width="752" height="575" alt="erd" src="https://github.com/user-attachments/assets/f99e9a68-fb2c-4d57-a203-57523958b16b" />
+> ERD diagram pôvodnej štruktúry.
 
 ---
 
@@ -105,8 +106,8 @@ Hlavné stĺpce:
 - `quarter`
 - `day_name`
 
-> Star schema diagram je uložený v priečinku `/img/star_schema.png`.
-
+<img width="803" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/2e62c94e-3718-425f-828b-b7cf986f21a2" />
+> Star schema.
 ---
 
 ## 4. ELT proces v Snowflake
