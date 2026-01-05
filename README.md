@@ -1,116 +1,124 @@
-##ELT proces datasetu TPC-DS (Retail Sales Analytics)
+ELT proces datasetu TPC-DS (Retail Sales Analytics)
 
-Tento repozitár prezentuje kompletnú implementáciu ELT procesu v Snowflake a návrh dátového skladu založeného na dimenzionálnom modeli typu Star Schema. Projekt pracuje s datasetom TPC-DS, ktorý je dostupný prostredníctvom Snowflake Marketplace.
+Tento repozitár dokumentuje kompletný proces spracovania dát pomocou ELT architektúry v prostredí Snowflake. Projekt je zameraný na návrh a implementáciu dátového skladu (DWH) s využitím dimenzionálneho modelu typu Star Schema nad datasetom TPC-DS, dostupným v Snowflake Marketplace.
 
-Cieľom projektu je analyzovať maloobchodný predaj, správanie zákazníkov, výkonnosť produktov a predajní v čase. Výsledný dátový model umožňuje multidimenzionálnu analýzu a tvorbu analytických vizualizácií nad agregovanými dátami.
+Výsledný dátový model umožňuje multidimenzionálnu analýzu predajných dát, správania zákazníkov a časových trendov v maloobchodnom prostredí.
 
-1. Úvod a popis zdrojových dát
+1. Úvod a popis zdrojových dát / Odôvodnenie výberu
+1.1 Charakteristika datasetu
 
-V tomto projekte analyzujeme dáta z oblasti retailového predaja, ktoré simulujú reálne obchodné procesy veľkého maloobchodného reťazca. Analýza je zameraná najmä na:
+Dataset TPC-DS predstavuje štandardizovaný benchmark pre analytické databázy a simuluje reálne obchodné procesy veľkého maloobchodného reťazca. Obsahuje údaje o:
 
-správanie zákazníkov,
+zákazníkoch,
 
-predaj produktov v jednotlivých predajniach,
+produktoch,
 
-časové trendy tržieb,
+predajniach,
 
-identifikáciu najvýkonnejších produktov a zákazníkov.
+predajných transakciách,
 
-Zdroj dát
+časových dimenziách.
 
-Zdrojové dáta pochádzajú z datasetu TPC-DS (Decision Support Benchmark), ktorý je dostupný v Snowflake Marketplace ako súčasť databázy SNOWFLAKE_SAMPLE_DATA.
+Dáta sú vhodné na analytické dotazy typu Decision Support a sú často využívané v akademickom aj komerčnom prostredí.
 
-Dataset bol spracovaný ako reprezentatívna vzorka (100 riadkov) z dôvodu kvótových a výpočtových limitov Snowflake účtu. Cieľom projektu nie je práca s veľkým objemom dát, ale demonštrácia správneho návrhu ELT procesu a dátového skladu.
+1.2 Voľba datasetu
 
-1.1 Zdrojové tabuľky
+Dataset TPC-DS bol zvolený z nasledujúcich dôvodov:
 
-V projekte boli využité nasledujúce tabuľky zo zdrojového datasetu:
+dostupnosť priamo v Snowflake Marketplace (bez potreby externých zdrojov),
 
-CUSTOMER – demografické údaje o zákazníkoch
+realistická simulácia retailového biznis procesu,
 
-ITEM – informácie o produktoch (kategória, značka)
+bohatá štruktúra dát vhodná pre návrh dimenzionálneho modelu,
 
-STORE – údaje o predajniach a ich lokalite
+vhodnosť na demonštráciu ELT procesu a analytických vizualizácií.
+
+1.3 Podporovaný biznis proces
+
+Analyzované dáta podporujú najmä tieto biznis procesy:
+
+sledovanie predaja produktov,
+
+analýzu správania zákazníkov,
+
+hodnotenie výkonnosti predajní,
+
+časové porovnania tržieb.
+
+Výsledky analýzy môžu byť využité pri rozhodovaní o marketingových stratégiách, optimalizácii sortimentu a plánovaní predaja.
+
+1.4 Zdrojové tabuľky
+
+Zo zdrojového datasetu boli využité nasledujúce tabuľky:
+
+CUSTOMER – demografické údaje zákazníkov
+
+ITEM – informácie o produktoch
+
+STORE – údaje o predajniach
 
 DATE_DIM – kalendárna dimenzia
 
-STORE_SALES – transakčné údaje o predajoch
+STORE_SALES – transakčné údaje o predaji
 
-ERD diagram pôvodnej dátovej štruktúry je uložený v priečinku
-(pridaj obrázok!!!)
+📌 ERD diagram pôvodnej dátovej štruktúry je uložený v priečinku /img/source_erd.png.
 
-2. Dimenzionálny model
+2. Návrh dimenzionálneho modelu
 
-Pre analytické účely bol navrhnutý hviezdicový model (Star Schema) podľa Kimballovej metodológie. Model pozostáva z jednej faktovej tabuľky fact_store_sales a štyroch dimenzií.
+Pre analytické spracovanie dát bol navrhnutý hviezdicový model (Star Schema) podľa Kimballovej metodológie.
 
-Použité dimenzie
+Model pozostáva z jednej faktovej tabuľky a štyroch dimenzií:
 
-dim_customer – zákazníci
+fact_store_sales
 
-dim_item – produkty
+dim_customer
 
-dim_store – predajne
+dim_item
 
-dim_date – časová dimenzia
+dim_store
 
-Faktová tabuľka
+dim_date
 
-fact_store_sales – predajné transakcie
-
-📌 Schéma hviezdy je znázornená na diagrame uloženom v
-/img/star_schema.png
+📌 Schéma hviezdy je znázornená na obrázku /img/star_schema.png.
 
 2.1 Dimenzie
 dim_customer (SCD Typ 1)
 
-PK: customer_sk
-
-Atribúty: meno, priezvisko, pohlavie, rok narodenia, krajina
-
-Zmeny sa prepíšu (SCD Type 1)
+Obsahuje základné demografické údaje o zákazníkoch. Pri zmene údajov dochádza k prepísaniu existujúcich hodnôt.
 
 dim_item (SCD Typ 1)
 
-PK: item_sk
-
-Atribúty: názov produktu, kategória, značka
+Obsahuje informácie o produktoch, ich kategórii a značke.
 
 dim_store (SCD Typ 1)
 
-PK: store_sk
-
-Atribúty: názov predajne, mesto, štát, krajina
+Obsahuje údaje o predajniach a ich geografickej lokalite.
 
 dim_date (SCD Typ 0)
 
-PK: date_sk
-
-Atribúty: dátum, rok, mesiac, deň, kvartál
-
-Nemenná dimenzia (SCD Type 0)
+Nemenná časová dimenzia slúžiaca na analýzu dát v čase.
 
 2.2 Faktová tabuľka
 fact_store_sales
 
-PK: sales_sk
+Faktová tabuľka obsahuje informácie o predajných transakciách a prepojenia na všetky dimenzie.
 
-FK: customer_sk, item_sk, store_sk, date_sk
+Metriky:
 
-Metriky: quantity, sales_amount
+množstvo predaných kusov,
 
-Použité window functions:
+celková suma predaja.
 
-SUM(sales_amount) OVER (PARTITION BY customer_sk)
+Vo faktovej tabuľke sú použité window functions, napríklad:
 
-RANK() OVER (PARTITION BY store_sk ORDER BY sales_amount DESC)
+SUM(...) OVER (PARTITION BY ...)
+
+RANK() OVER (ORDER BY ...)
 
 3. ELT proces v Snowflake
-
-ELT proces bol implementovaný v troch hlavných krokoch: Extract, Load, Transform.
-
 3.1 Extract
 
-Dáta boli extrahované zo Snowflake Marketplace databázy SNOWFLAKE_SAMPLE_DATA do staging vrstvy pomocou príkazu:
+Dáta boli extrahované zo Snowflake Marketplace databázy SNOWFLAKE_SAMPLE_DATA do staging vrstvy pomocou SQL príkazov typu:
 
 CREATE OR REPLACE TABLE customer_staging AS
 SELECT * FROM SNOWFLAKE_SAMPLE_DATA.TPCDS_SF10TCL.CUSTOMER;
@@ -129,49 +137,29 @@ deduplikáciu dát,
 
 čistenie údajov,
 
-výpočet agregácií,
+agregácie,
 
-použitie window functions vo faktovej tabuľke.
-
-Výsledkom je optimalizovaný dimenzionálny model vhodný na analytické dotazy.
+použitie window functions.
 
 4. Vizualizácia dát
 
-V Snowflake Dashboarde bolo vytvorených 5 analytických vizualizácií:
+V Snowflake Dashboarde bolo vytvorených minimálne 5 vizualizácií, ktoré zobrazujú:
 
-Celkové tržby v čase
+vývoj tržieb v čase,
 
-Top produkty podľa tržieb
+najpredávanejšie produkty,
 
-Výkonnosť predajní podľa štátov
+výkonnosť predajní,
 
-Top zákazníci podľa obratu
+top zákazníkov,
 
-Poradie produktov v rámci predajní
+poradie produktov podľa tržieb.
 
-Každá vizualizácia obsahuje SQL dotaz, obrázok grafu a stručnú interpretáciu výsledkov.
-
-5. Štruktúra repozitára
-/sql
-  ├── extract.sql
-  ├── load.sql
-  ├── transform_dimensions.sql
-  ├── transform_fact.sql
-
-/img
-  ├── source_erd.png
-  ├── star_schema.png
-  ├── viz_1.png
-  ├── viz_2.png
-  ├── viz_3.png
-  ├── viz_4.png
-  ├── viz_5.png
-
-README.md
+Každá vizualizácia obsahuje SQL dotaz, obrázok grafu a interpretáciu výsledkov.
 
 Záver
 
-Projekt demonštruje kompletný ELT proces v Snowflake, návrh dimenzionálneho modelu typu Star Schema, použitie window functions a tvorbu analytických vizualizácií. Riešenie je navrhnuté tak, aby bolo možné ho rozšíriť na väčší objem dát bez zmeny architektúry.
+Projekt demonštruje kompletný ELT proces v Snowflake, návrh dimenzionálneho dátového skladu a využitie analytických nástrojov na spracovanie retailových dát. Výsledný model je škálovateľný a pripravený na rozšírenie o väčší objem dát.
 
 Autor:
-Lukáš Horvát,Marco Gunda
+Meno Priezvisko
