@@ -105,9 +105,9 @@ Hlavné stĺpce:
 - `month`
 - `quarter`
 - `day_name`
-Star Schéma:
-<img width="803" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/2e62c94e-3718-425f-828b-b7cf986f21a2" />
 
+<img width="803" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/2e62c94e-3718-425f-828b-b7cf986f21a2" />
+Star Schéma:
 ---
 
 ## 4. ELT proces v Snowflake
