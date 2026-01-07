@@ -261,9 +261,10 @@ WHERE ss.ss_sold_date_sk IS NOT NULL;
 ```
 ---
 ## **4. Vizualizácie**
-
+<p align="center">
 <img width="500" height="500" alt="viz1" src="https://github.com/user-attachments/assets/83d9f559-fcb9-4e30-b419-3bad65c9fd89" />
 <img width="500" height="500" alt="viz2" src="https://github.com/user-attachments/assets/f73dd3b2-96c4-441d-a313-2fae3312690d" />
+</p>
 <p align="center"><em>Obrázok 3,4 Vizualizácie</em></p>
 
 ---
