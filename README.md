@@ -226,6 +226,7 @@ WHERE
     AND ss.ss_item_sk IS NOT NULL
     AND ss.ss_store_sk IS NOT NULL
     AND ss.ss_customer_sk IS NOT NULL;
+```
 ---
 
 ## **4. Vizualizácie**
@@ -244,6 +245,7 @@ FROM FACT_STORE_SALES f
 JOIN DIM_ITEM i ON f.item_sk = i.item_sk
 GROUP BY i.category
 ORDER BY total_revenue DESC;
+
 
 
 
