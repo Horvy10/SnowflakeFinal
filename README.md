@@ -1,125 +1,111 @@
-# ELT proces – TPC-DS dataset (Snowflake)
+# **ELT proces datasetu TPC-DS (Retail Sales)**
 
-Tento projekt prezentuje kompletnú implementáciu **ELT procesu a dátového skladu (DWH)** v prostredí **Snowflake** nad datasetom **TPC-DS**, ktorý je dostupný prostredníctvom **Snowflake Marketplace**.  
-Cieľom projektu je návrh a implementácia **dimenzionálneho modelu (Star Schema)** a tvorba analytických vizualizácií nad agregovanými dátami.
+Tento repozitár predstavuje finálnu implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg**, dostupným v **Snowflake Marketplace**. Projekt sa zameriava na analýzu maloobchodného predaja (store sales) a správania zákazníkov naprieč obchodmi, produktmi, časom a geografickými lokalitami.
 
-Projekt je vypracovaný ako záverečné zadanie k predmetu zameranému na dátové sklady a analytické systémy.
-
----
-
-## 1. Úvod a popis zdrojových dát
-
-### 1.1 Výber datasetu
-
-Pre tento projekt bol zvolený dataset **TPC-DS**, ktorý predstavuje štandardizovaný benchmark pre analytické databázy. Dataset simuluje **retailový biznis proces** (predaj v kamenných obchodoch, zákazníci, produkty, dátumové dimenzie).
-
-Dôvody výberu datasetu:
-- dataset je **dostupný zdarma** v Snowflake Marketplace,
-- obsahuje **reálne použiteľnú biznis doménu** (retail),
-- je vhodný na návrh **hviezdicovej schémy**,
-- umožňuje tvorbu analytických dotazov a dashboardov.
-
-### 1.2 Biznis proces
-
-Analyzovaný biznis proces:
-- predaj produktov v kamenných obchodoch,
-- správanie zákazníkov,
-- tržby, množstvo predaného tovaru,
-- časové trendy predaja.
-
-Analýza je zameraná najmä na:
-- vývoj predaja v čase,
-- správanie zákazníkov,
-- porovnanie predajov medzi obchodmi a produktmi.
+Cieľom projektu je demonštrovať návrh a implementáciu **dátového skladu so schémou hviezdy (Star Schema)**, využitie **window functions**, ako aj tvorbu **vizualizácií nad agregovanými dátami**.
 
 ---
 
-## 2. ERD – pôvodná dátová štruktúra
+## **1. Úvod a popis zdrojových dát**
 
-Pôvodná dátová štruktúra vychádza zo staging tabuliek vytvorených zo zdrojového datasetu TPC-DS.
+Pre tento projekt bol zvolený dataset **TPC-DS**, ktorý simuluje reálne transakčné dáta maloobchodného reťazca. Dataset podporuje analytické dotazy typické pre retail doménu, ako sú analýzy predaja, správania zákazníkov a výkonnosti obchodov.
 
-Použité staging tabuľky:
-- `customer_staging`
-- `date_staging`
-- `item_staging`
-- `store_staging`
-- `store_sales_staging`
+### Prečo TPC-DS:
+- dostupný zdarma v Snowflake Marketplace,
+- realistický retailový biznis proces,
+- bohatá dátová štruktúra vhodná pre DWH,
+- často používaný benchmark v praxi.
 
-Tieto tabuľky predstavujú relačný model s väzbami medzi entitami (zákazník, produkt, obchod, dátum a predaj).
-
-ERD diagram pôvodnej štruktúry:
-<img width="752" height="575" alt="erd" src="https://github.com/user-attachments/assets/f99e9a68-fb2c-4d57-a203-57523958b16b" />
+### Použité zdrojové tabuľky:
+- **DATE_DIM** – kalendárna dimenzia
+- **ITEM** – produkty
+- **STORE** – obchody a geografia
+- **CUSTOMER** – zákazníci
+- **STORE_SALES** – transakčné dáta (predaje)
 
 ---
 
-## 3. Návrh dimenzionálneho modelu (Star Schema)
+## **1.1 Dátová architektúra – ERD**
 
-Na základe ERD bol navrhnutý **hviezdicový model (Star Schema)** podľa Kimballovej metodológie.
+Pôvodné dáta sú uložené v normalizovanom relačnom modeli (ERD), typickom pre OLTP/benchmark databázy. ERD diagram znázorňuje vzťahy medzi tabuľkami STORE_SALES, ITEM, STORE, CUSTOMER a DATE_DIM.
 
-### 3.1 Faktová tabuľka
+*(ERD diagram je súčasťou priečinka /img)*
 
-**fact_store_sales**
-
-Obsahuje metriky predaja a cudzie kľúče na dimenzie.
-
-Hlavné stĺpce:
-- `ss_id` – primárny kľúč faktovej tabuľky
-- `ss_quantity` – množstvo predaných kusov
-- `ss_net_paid` – čistá hodnota predaja
-- `ss_sales_price` – cena predaja
-- `item_sk` – FK na dimenziu produktu
-- `store_sk` – FK na dimenziu obchodu
-- `customer_sk` – FK na dimenziu zákazníka
-- `date_sk` – FK na dimenziu dátumu
-
-### 3.2 Dimenzie
-
-#### dim_item (SCD Typ 0)
-- `item_sk` (PK)
-- `item_id`
-- `item_desc`
-- `category`
-- `class`
-- `brand`
-
-#### dim_store (SCD Typ 0)
-- `store_sk` (PK)
-- `store_id`
-- `store_name`
-- `city`
-- `state`
-- `country`
-
-#### dim_customer (SCD Typ 1)
-- `customer_sk` (PK)
-- `first_name`
-- `last_name`
-- `gender`
-- `birth_year`
-- `current_country`
-
-#### dim_date (SCD Typ 0)
-- `date_sk` (PK)
-- `date`
-- `year`
-- `month`
-- `quarter`
-- `day_name`
-
-<img width="803" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/2e62c94e-3718-425f-828b-b7cf986f21a2" />
-Star Schéma:
 ---
 
-## 4. ELT proces v Snowflake
+## **2. Dimenzionálny model (Star Schema)**
 
-### 4.1 Extract
+Na analytické účely bol navrhnutý **hviezdicový model** podľa Kimballovej metodológie.
 
-Zdrojové dáta pochádzajú zo Snowflake Marketplace:
-- databáza: `TPCDS`
-- schéma: `PUBLIC`
+### Faktová tabuľka:
+- **FACT_STORE_SALES**
+  - metriky: `ss_quantity`, `ss_sales_price`, `ss_net_paid`
+  - cudzie kľúče na všetky dimenzie
 
-Staging tabuľky boli vytvorené pomocou:
+### Dimenzie:
+- **DIM_DATE** (SCD Typ 0)
+- **DIM_ITEM** (SCD Typ 0)
+- **DIM_STORE** (SCD Typ 0)
+- **DIM_CUSTOMER** (SCD Typ 1)
 
-```sql
-CREATE OR REPLACE TABLE customer_staging AS
-SELECT * FROM TPCDS.PUBLIC.CUSTOMER;
+Hviezdicová schéma zjednodušuje analytické dotazy a umožňuje efektívne agregácie.
+
+*(Diagram Star Schema je súčasťou priečinka /img)*
+
+---
+
+## **3. ELT proces v Snowflake**
+
+### **3.1 Extract**
+Dáta boli extrahované zo Snowflake Marketplace databázy:
+
+```
+TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
+```
+
+Pre každý zdroj bol vytvorený staging objekt pomocou `CREATE OR REPLACE TABLE AS SELECT`.
+
+---
+
+### **3.2 Load**
+Dáta boli načítané do vlastnej databázy **BOA_DB** a schémy **PROJEKT_STAGING**. V tejto vrstve prebehla základná filtrácia (napr. predaje od roku 2000).
+
+---
+
+### **3.3 Transform**
+V tejto fáze boli:
+- vytvorené dimenzie a faktová tabuľka,
+- aplikované CAST-y a deduplikácia,
+- implementované **window functions** vo faktovej tabuľke.
+
+#### Použité window functions:
+- **SUM() OVER()** – kumulatívne tržby obchodu,
+- **RANK() OVER()** – poradie predajov v rámci obchodu,
+- **LAG() OVER()** – predchádzajúca hodnota nákupu zákazníka.
+
+Tieto funkcie umožňujú pokročilú analytiku bez nutnosti ďalších agregácií.
+
+---
+
+## **4. Vizualizácia dát**
+
+Dashboard obsahuje **viac ako 5 vizualizácií**, vytvorených priamo zo SQL dotazov nad faktovou tabuľkou.
+
+### Príklady vizualizácií:
+1. Počet transakcií podľa dní v týždni a obchodov
+2. Najaktívnejšie mestá podľa počtu transakcií
+3. Najlepšie štáty podľa objemu predaja
+4. Veľkosť nákupného košíka podľa obchodu a kategórie
+5. Počet transakcií podľa kategórie a mesta
+6. Aktivita predajní v konkrétny deň (napr. štvrtok)
+
+Vizualizácie kombinujú viacero dimenzií a poskytujú komplexný pohľad na dáta.
+
+---
+
+
+
+---
+
+## **Autori:Lukáš Horvát,Marco Gunda**
+****
