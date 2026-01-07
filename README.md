@@ -1,8 +1,8 @@
 # **ELT proces datasetu TPC-DS v Snowflake**
 
-Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg** (Snowflake Marketplace). Projekt sa zameriava na analýzu maloobchodného predaja (store sales) a správania zákazníkov naprieč obchodmi, produktmi, časom a geografickými lokalitami.
+Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg**. Projekt sa zameriava na analýzu maloobchodného predaja a správania zákazníkov naprieč obchodmi, produktmi, časom a geografickými lokalitami.
 
-Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tabuľka s **window functions** a minimálne **5 vizualizácií** vytvorených v Snowflake Dashboarde.
+Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tabuľka s **window functions** a **6 vizualizácií** vytvorenými v Snowflake Dashboarde.
 
 ---
 
@@ -11,16 +11,17 @@ Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tab
 ### Prečo TPC-DS
 - dataset je dostupný v **Snowflake Marketplace**,
 - simuluje realistický retailový biznis proces,
-- má bohatý model vhodný na návrh DWH (Kimball).
+- vysoká praktickosť,
+- schopnosť analyzovať veľké množstvo dát
 
-### Použité zdrojové tabuľky (Marketplace)
-- `DATE_DIM` – kalendár (dátum, rok, mesiac, štvrťrok, deň v týždni…)
-- `ITEM` – produktové údaje (kategória, trieda, značka…)
-- `STORE` – obchody a geografia (mesto, štát…)
-- `CUSTOMER` – demografia zákazníkov
+### Použité zdrojové tabuľky
+- `DATE_DIM` – dátum, rok, mesiac, štvrťrok, deň v týždni,
+- `ITEM` – produktové údaje (kategória, trieda, značka...)
+- `STORE` – obchody a geografia (mesto, štát...)
+- `CUSTOMER` – tabuľka zákazníkov(meno,priezvisko...)
 - `STORE_SALES` – transakčné údaje o predaji v predajni
 
-**Marketplace databáza/schéma:**
+**Marketplace databáza:**
 ```sql
 TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
 ```
@@ -37,19 +38,19 @@ TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
 Navrhnutý model obsahuje 1 faktovú tabuľku a 4 dimenzie:
 
 ### Dimenzie
-- `DIM_DATE` (SCD Typ 0) – kalendár (statické atribúty)
-- `DIM_ITEM` (SCD Typ 0) – produktové atribúty (statické)
-- `DIM_STORE` (SCD Typ 0) – obchod + geografia (statické)
-- `DIM_CUSTOMER` (SCD Typ 1) – demografia (aktualizácia bez histórie)
+- `DIM_DATE`
+- `DIM_ITEM`
+- `DIM_STORE`
+- `DIM_CUSTOMER`
 
 ### Faktová tabuľka
 - `FACT_STORE_SALES`
   - FK: `date_sk`, `item_sk`, `store_sk`, `customer_sk`
   - metriky: `ss_quantity`, `ss_sales_price`, `ss_net_paid`
-  - analytické stĺpce cez **window functions**
+  - window functions
 
 <p align="center">
-<img width="600" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/d853cae6-3e8b-4f88-89c7-bfc1ef1a15a1" />
+<img width="500" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/d853cae6-3e8b-4f88-89c7-bfc1ef1a15a1" />
 </p>
 <p align="center"><em>Obrázok 2 Star Schéma</em></p>
 
@@ -77,11 +78,11 @@ Zdrojové dáta pochádzajú zo **Snowflake Marketplace**, konkrétne z datasetu
 
 Dataset je **read-only**, čo znamená, že ho nie je možné priamo upravovať.  
 Z tohto dôvodu boli dáta extrahované do vlastnej databázy pomocou príkazu  
-**CTAS (CREATE TABLE AS SELECT)**.
+**CREATE TABLE AS SELECT**.
 
 ---
 
-### 3.2 Load – staging tabuľky (CTAS)
+### 3.2 Load – staging tabuľky
 
 Dáta boli načítané do databázy **BOA_DB** do schémy **PROJEKT_STAGING**, ktorá slúži ako staging vrstva.
 
@@ -129,13 +130,15 @@ WHERE ss.ss_sold_date_sk IS NOT NULL
   AND ss.ss_store_sk IS NOT NULL
   AND ss.ss_customer_sk IS NOT NULL
 LIMIT 100000;
----
 ```
+---
 
 ### 3.3 Transform – tvorba dimenzií
 V tejto fáze boli staging tabuľky transformované do dimenzionálneho modelu (Star Schema).
-Transformácia zahŕňala výber relevantných atribútov, odstránenie NULL hodnôt
+Transformácia zahŕňala výber špecifických stĺpcov,kvôli redukovaniu nadbytočných dát, odstránenie NULL hodnôt
 a vytvorenie dimenzií so správnym SCD typom.
+
+---
 
 ### 3.4 DIM_DATE
 Časová dimenzia umožňuje analýzu dát podľa dňa, mesiaca, roka a štvrťroka.
@@ -168,7 +171,7 @@ FROM ITEM_STAGING
 WHERE i_item_sk IS NOT NULL;
 ```
 ### 3.6 DIM_STORE
-Geografická dimenzia obchodov.
+Dimenzia obchodov a ich lokality(štát,mesto,ulica...).
 **SCD: Type 0 – obchody sú stabilné**
 ```sql
 CREATE OR REPLACE TABLE DIM_STORE AS
@@ -184,7 +187,7 @@ WHERE s_store_sk IS NOT NULL;
 ```
 
 ### 3.7 DIM_CUSTOMER
-Dimenzia zákazníkov obsahuje základné demografické údaje.
+Dimenzia zákazníkov obsahuje základné údaje(meno,priezvisko,email...).
 **SCD: Type 1 – aktualizácia bez histórie**
 ```sql
 CREATE OR REPLACE TABLE DIM_CUSTOMER AS
@@ -200,9 +203,10 @@ WHERE c_customer_sk IS NOT NULL;
 ```
 ### 3.8 FACT_STORE_SALES
 Faktová tabuľka prepája všetky dimenzie a obsahuje merateľné hodnoty predaja.
-Obsahuje aj window functions, ktoré umožňujú pokročilú analytiku.
+Obsahuje aj window functions, ktoré umožňujú pokročilú analýzu.
 
 Použité window functions:
+
 -ROW_NUMBER() – technický primárny kľúč
 
 -SUM() OVER() – kumulatívny obrat obchodu
@@ -256,7 +260,6 @@ WHERE ss.ss_sold_date_sk IS NOT NULL;
 ---
 ## **4. Vizualizácie**
 
-> Vizualizácie boli vytvorené v Snowflake **Dashboard**.  
 <img width="500" height="500" alt="viz1" src="https://github.com/user-attachments/assets/83d9f559-fcb9-4e30-b419-3bad65c9fd89" />
 <img width="500" height="500" alt="viz2" src="https://github.com/user-attachments/assets/f73dd3b2-96c4-441d-a313-2fae3312690d" />
 <p align="center"><em>Obrázok 3,4 Vizualizácie</em></p>
@@ -273,7 +276,7 @@ JOIN DIM_ITEM i ON f.item_sk = i.item_sk
 GROUP BY i.category
 ORDER BY total_revenue DESC;
 ```
-Kód slúži na vytvorenie grafu, ktorý vizualizuje celkové tržby (net paid) podľa produktovej kategórie. Umožňuje rýchlo identifikovať najvýkonnejšie kategórie.
+Kód slúži na vytvorenie grafu, ktorý vizualizuje celkové tržby podľa produktovej kategórie. Umožňuje rýchlo identifikovať najziskovejšie kategórie.
 
 ## Graf 2: Top 10 obchodov podľa tržieb
 ```sql
@@ -286,9 +289,9 @@ GROUP BY s.store_name
 ORDER BY total_revenue DESC
 LIMIT 10;
 ```
-Kód slúži na vytvorenie grafu, ktorý vizualizuje 10 obchodov s najvyššími tržbami. Graf pomáha porovnávať výkonnosť predajní.
+Kód slúži na vytvorenie grafu, ktorý vizualizuje 10 obchodov s najvyššími tržbami. Graf pomáha porovnávať zisk predajní.
 
-## Graf 3: Najaktívnejšie obchody podľa počtu transakcií (rok 2000)
+## Graf 3: Najaktívnejšie obchody podľa počtu transakcií v roku 2000
 ```sql
 SELECT
   s.store_name,
@@ -301,7 +304,7 @@ GROUP BY s.store_name
 ORDER BY transactions_count DESC
 LIMIT 20;
 ```
-Kód slúži na vytvorenie grafu, ktorý vizualizuje najaktívnejšie predajne podľa počtu transakcií za rok 2000. Umožňuje sledovať aktivitu predajní bez ohľadu na výšku tržieb.
+Kód slúži na vytvorenie grafu, ktorý vizualizuje najaktívnejšie predajne podľa počtu transakcií za rok 2000. Umožňuje sledovať aktivitu a výkonnosť predajní.
 
 ## Graf 4: Aktivita zákazníkov podľa roku narodenia
 ```sql
@@ -327,9 +330,9 @@ JOIN DIM_ITEM i  ON f.item_sk = i.item_sk
 GROUP BY s.store_name, i.category
 ORDER BY avg_items_per_sale DESC;
 ```
-Kód slúži na vytvorenie grafu, ktorý vizualizuje veľkosť nákupného košíka (priemerný počet kusov na transakciu) podľa obchodu a kategórie. Je vhodný na porovnanie nákupného správania medzi predajňami.
+Kód slúži na vytvorenie grafu, ktorý vizualizuje priemerný počet kusov na transakciu podľa obchodu a kategórie. Je vhodný na porovnanie nákupného správania medzi predajňami.
 
-## Graf 6: Priemerný počet položiek na transakciu podľa obchodu a kategórie
+## Graf 6: Top kategórie v jednotlivých mestách podľa počtu transakcií
 ```sql
 SELECT
   s.city,
@@ -344,6 +347,4 @@ LIMIT 50;
 ```
 Kód slúži na vytvorenie grafu, ktorý vizualizuje najčastejšie kombinácie mesto–kategória podľa počtu transakcií. Pomáha identifikovať regionálne preferencie produktov.
 
----
----
 Autori:Lukáš Horvát,Marco Gunda
