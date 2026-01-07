@@ -1,6 +1,8 @@
 # **ELT proces datasetu TPC-DS v Snowflake**
 
-Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg**. Projekt sa zameriava na analýzu maloobchodného predaja a správania zákazníkov naprieč obchodmi, produktmi, časom a geografickými lokalitami.
+Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg**. 
+
+V projekte sme sa rozhodli vybrať iba päť tabuliek z celého datasetu TPC-DS, ktoré spolu tvoria ucelený a logicky prepojený biznis proces predaja v napríklad kamenných obchodoch a predajniach. Cieľom bolo zjednodušiť dátový model a vytvoriť plnohodnotnú hviezdicovú schému. Vybrané tabuľky pokrývajú kľúčové entity predaje, zákazníci, produkty, obchody a čas,  čo umožňuje vytvoriť plnohodnotnú hviezdicovú schému.
 
 Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tabuľka s **window functions** a **6 vizualizácií** vytvorenými v Snowflake Dashboarde.
 
