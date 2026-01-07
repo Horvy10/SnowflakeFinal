@@ -159,7 +159,7 @@ FROM BOA_DB.PROJEKT_STAGING.CUSTOMER_STAGING
 WHERE c_customer_sk IS NOT NULL;
 
 ---
-
+---
 ## **3.3 Faktová tabuľka**
 
 ```sql
