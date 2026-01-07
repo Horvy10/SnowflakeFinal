@@ -26,7 +26,10 @@ TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
 ```
 
 ### ERD pôvodného modelu
-ERD (relačný model zdrojových tabuliek) je v `/img/erd.png`.
+
+<img width="500" height="500" alt="erd" src="https://github.com/user-attachments/assets/615dc815-7d7c-455d-a955-a13a978faf3a" />
+<p align="center"><em>Obrázok 1 ERD Model</em></p>
+
 
 ---
 
@@ -46,7 +49,8 @@ Navrhnutý model obsahuje 1 faktovú tabuľku a 4 dimenzie:
   - metriky: `ss_quantity`, `ss_sales_price`, `ss_net_paid`
   - analytické stĺpce cez **window functions** (povinné v zadaní)
 
-Star Schema diagram je v `/img/star_schema.png`.
+<img width="600" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/d853cae6-3e8b-4f88-89c7-bfc1ef1a15a1" />
+<p align="center"><em>Obrázok 2 Star Schéma</em></p>
 
 ---
 
@@ -97,8 +101,7 @@ LIMIT 100000;
 
 ---
 
-### **3.2 Load/Transform → dimenzie + fakt (Star Schema)**
-Finálne tabuľky sú vytvorené v schéme `PROJEKT_DWH`.
+### **3.2 Load/Transform **
 
 ```sql
 CREATE OR REPLACE SCHEMA BOA_DB.PROJEKT_STAR;
@@ -232,7 +235,9 @@ WHERE
 ## **4. Vizualizácie**
 
 > Vizualizácie boli vytvorené v Snowflake **Dashboard**.  
-> Screenshot dashboardu je v `/img/dashboard.png`.
+<img width="500" height="500" alt="viz1" src="https://github.com/user-attachments/assets/83d9f559-fcb9-4e30-b419-3bad65c9fd89" />
+<img width="500" height="500" alt="viz2" src="https://github.com/user-attachments/assets/f73dd3b2-96c4-441d-a313-2fae3312690d" />
+<p align="center"><em>Obrázok 3,4 Vizualizácie</em></p>
 
 ---
 ```sql
