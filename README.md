@@ -4,7 +4,7 @@ Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad dataset
 
 V projekte sme sa rozhodli vybrať iba päť tabuliek z celého datasetu TPC-DS, ktoré spolu tvoria ucelený a logicky prepojený biznis proces predaja v napríklad kamenných obchodoch a predajniach. Cieľom bolo zjednodušiť dátový model a vytvoriť plnohodnotnú hviezdicovú schému. Vybrané tabuľky pokrývajú kľúčové entity predaje, zákazníci, produkty, obchody a čas,  čo umožňuje vytvoriť plnohodnotnú hviezdicovú schému.
 
-Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tabuľka s **window functions** a **6 vizualizácií** vytvorenými v Snowflake Dashboarde.
+Výsledkom je **dátový sklad s hviezdicovou schémou**, faktová tabuľka s **window functions** a **6 vizualizácií** vytvorenými v Snowflake Dashboarde.
 
 ---
 
