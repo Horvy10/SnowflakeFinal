@@ -52,7 +52,7 @@ Navrhnutý model obsahuje 1 faktovú tabuľku a 4 dimenzie:
 <p align="center">
 <img width="500" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/d853cae6-3e8b-4f88-89c7-bfc1ef1a15a1" />
 </p>
-<p align="center"><em>Obrázok 2 Star Schéma</em></p>
+<p align="center"><em>Obrázok 2 Star Schema</em></p>
 
 ---
 
