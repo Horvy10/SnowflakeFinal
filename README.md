@@ -29,7 +29,8 @@ Pre tento projekt bol zvolený dataset **TPC-DS**, ktorý simuluje reálne trans
 
 Pôvodné dáta sú uložené v normalizovanom relačnom modeli (ERD), typickom pre OLTP/benchmark databázy. ERD diagram znázorňuje vzťahy medzi tabuľkami STORE_SALES, ITEM, STORE, CUSTOMER a DATE_DIM.
 
-*(ERD diagram je súčasťou priečinka /img)*
+<img width="871" height="935" alt="erd" src="https://github.com/user-attachments/assets/b7ccd69b-3662-468c-ac50-cd051b7d7f87" />
+
 
 ---
 
@@ -50,7 +51,8 @@ Na analytické účely bol navrhnutý **hviezdicový model** podľa Kimballovej 
 
 Hviezdicová schéma zjednodušuje analytické dotazy a umožňuje efektívne agregácie.
 
-*(Diagram Star Schema je súčasťou priečinka /img)*
+<img width="802" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/93f5f899-3150-4d89-bb78-0d60ca8d6021" />
+
 
 ---
 
@@ -89,7 +91,7 @@ Tieto funkcie umožňujú pokročilú analytiku bez nutnosti ďalších agregác
 
 ## **4. Vizualizácia dát**
 
-Dashboard obsahuje **viac ako 5 vizualizácií**, vytvorených priamo zo SQL dotazov nad faktovou tabuľkou.
+Dashboard obsahuje **6 vizualizácii**, vytvorených priamo zo SQL dotazov nad faktovou tabuľkou.
 
 ### Príklady vizualizácií:
 1. Počet transakcií podľa dní v týždni a obchodov
@@ -101,11 +103,14 @@ Dashboard obsahuje **viac ako 5 vizualizácií**, vytvorených priamo zo SQL dot
 
 Vizualizácie kombinujú viacero dimenzií a poskytujú komplexný pohľad na dáta.
 
+<img width="1140" height="588" alt="viz2" src="https://github.com/user-attachments/assets/4c4d2706-8db6-44a9-a71d-e416432ee95e" />
+<img width="1141" height="599" alt="viz1" src="https://github.com/user-attachments/assets/4515685d-86a0-4e40-b432-21e2490b15b0" />
+
+
 ---
 
 
 
 ---
 
-## **Autori:Lukáš Horvát,Marco Gunda**
-****
+Autori:Lukáš Horvát, Marco Gunda
