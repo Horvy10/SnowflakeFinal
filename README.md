@@ -1,4 +1,4 @@
-# **ELT proces datasetu TPC-DS (Retail Sales) v Snowflake**
+# **ELT proces datasetu TPC-DS v Snowflake**
 
 Tento repozitár obsahuje implementáciu **ELT procesu v Snowflake** nad datasetom **TPC-DS 10TB Managed Iceberg** (Snowflake Marketplace). Projekt sa zameriava na analýzu maloobchodného predaja (store sales) a správania zákazníkov naprieč obchodmi, produktmi, časom a geografickými lokalitami.
 
