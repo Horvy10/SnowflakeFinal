@@ -26,7 +26,7 @@ Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tab
 TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
 ```
 <p align="center">
-<img width="500" height="500" alt="erd" src="https://github.com/user-attachments/assets/615dc815-7d7c-455d-a955-a13a978faf3a" />
+<img width="500" height="500" alt="erd" src="https://github.com/user-attachments/assets/fc94c624-07f4-472f-8b83-3e1361c72be5" />
 </p>
 <p align="center"><em>Obrázok 1 ERD Model</em></p>
 
