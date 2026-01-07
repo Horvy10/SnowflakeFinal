@@ -29,7 +29,7 @@ Pre tento projekt bol zvolený dataset **TPC-DS**, ktorý simuluje reálne trans
 
 Pôvodné dáta sú uložené v normalizovanom relačnom modeli (ERD), typickom pre OLTP/benchmark databázy. ERD diagram znázorňuje vzťahy medzi tabuľkami STORE_SALES, ITEM, STORE, CUSTOMER a DATE_DIM.
 
-<img width="871" height="935" alt="erd" src="https://github.com/user-attachments/assets/b7ccd69b-3662-468c-ac50-cd051b7d7f87" />
+<img width="500" height="500" alt="erd" src="https://github.com/user-attachments/assets/b7ccd69b-3662-468c-ac50-cd051b7d7f87" />
 
 
 ---
@@ -51,7 +51,7 @@ Na analytické účely bol navrhnutý **hviezdicový model** podľa Kimballovej 
 
 Hviezdicová schéma zjednodušuje analytické dotazy a umožňuje efektívne agregácie.
 
-<img width="802" height="497" alt="hviezda" src="https://github.com/user-attachments/assets/93f5f899-3150-4d89-bb78-0d60ca8d6021" />
+<img width="500" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/93f5f899-3150-4d89-bb78-0d60ca8d6021" />
 
 
 ---
