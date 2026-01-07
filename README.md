@@ -103,8 +103,8 @@ Dashboard obsahuje **6 vizualizácii**, vytvorených priamo zo SQL dotazov nad f
 
 Vizualizácie kombinujú viacero dimenzií a poskytujú komplexný pohľad na dáta.
 
-<img width="1140" height="588" alt="viz2" src="https://github.com/user-attachments/assets/4c4d2706-8db6-44a9-a71d-e416432ee95e" />
-<img width="1141" height="599" alt="viz1" src="https://github.com/user-attachments/assets/4515685d-86a0-4e40-b432-21e2490b15b0" />
+<img width="500" height="500" alt="viz2" src="https://github.com/user-attachments/assets/4c4d2706-8db6-44a9-a71d-e416432ee95e" />
+<img width="500" height="500" alt="viz1" src="https://github.com/user-attachments/assets/4515685d-86a0-4e40-b432-21e2490b15b0" />
 
 
 ---
