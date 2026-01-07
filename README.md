@@ -25,8 +25,6 @@ Výsledkom je **dátový sklad so schémou hviezdy (Star Schema)**, faktová tab
 TPCDS_10TB_MANAGED_ICEBERG.TPCDS_SF10T_ICEBERG
 ```
 <p align="center">
-### ERD pôvodného modelu
-
 <img width="500" height="500" alt="erd" src="https://github.com/user-attachments/assets/615dc815-7d7c-455d-a955-a13a978faf3a" />
 </p>
 <p align="center"><em>Obrázok 1 ERD Model</em></p>
@@ -48,9 +46,11 @@ Navrhnutý model obsahuje 1 faktovú tabuľku a 4 dimenzie:
 - `FACT_STORE_SALES`
   - FK: `date_sk`, `item_sk`, `store_sk`, `customer_sk`
   - metriky: `ss_quantity`, `ss_sales_price`, `ss_net_paid`
-  - analytické stĺpce cez **window functions** (povinné v zadaní)
+  - analytické stĺpce cez **window functions**
 
+<p align="center">
 <img width="600" height="500" alt="hviezda" src="https://github.com/user-attachments/assets/d853cae6-3e8b-4f88-89c7-bfc1ef1a15a1" />
+</p>
 <p align="center"><em>Obrázok 2 Star Schéma</em></p>
 
 ---
