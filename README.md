@@ -350,4 +350,5 @@ LIMIT 50;
 ```
 Kód slúži na vytvorenie grafu, ktorý vizualizuje najčastejšie kombinácie mesto–kategória podľa počtu transakcií. Pomáha identifikovať regionálne preferencie produktov.
 
+---
 **Autori:Lukáš Horvát,Marco Gunda**
