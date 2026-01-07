@@ -318,7 +318,7 @@ GROUP BY s.city, i.category
 ORDER BY transactions_count DESC
 LIMIT 50;
 ```
-
+---
 ---
 
 
