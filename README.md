@@ -90,6 +90,7 @@ CREATE OR REPLACE SCHEMA BOA_DB.PROJEKT_STAGING;
 USE SCHEMA BOA_DB.PROJEKT_STAGING;
 ```
 Vytvorenie staging tabuliek:
+
 **DATE_STAGING**
 
 ```sql
@@ -203,9 +204,13 @@ Obsahuje aj window functions, ktoré umožňujú pokročilú analytiku.
 
 Použité window functions:
 -ROW_NUMBER() – technický primárny kľúč
+
 -SUM() OVER() – kumulatívny obrat obchodu
+
 -RANK() – poradie predajov v rámci obchodu
+
 -LAG() – porovnanie aktuálneho a predchádzajúceho nákupu zákazníka
+
 ```sql
 CREATE OR REPLACE TABLE FACT_STORE_SALES AS
 SELECT
@@ -257,9 +262,9 @@ WHERE ss.ss_sold_date_sk IS NOT NULL;
 <p align="center"><em>Obrázok 3,4 Vizualizácie</em></p>
 
 ---
-```sql
-Tržby podľa kategórie produktu :
 
+## Graf 1: Tržby podľa kategórie produktu
+```sql
 SELECT
   i.category,
   SUM(f.ss_net_paid) AS total_revenue
@@ -267,26 +272,24 @@ FROM FACT_STORE_SALES f
 JOIN DIM_ITEM i ON f.item_sk = i.item_sk
 GROUP BY i.category
 ORDER BY total_revenue DESC;
+```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje celkové tržby (net paid) podľa produktovej kategórie. Umožňuje rýchlo identifikovať najvýkonnejšie kategórie.
 
-
-
-
-
-Top 10 obchodov podľa tržieb : 
-
+## Graf 2: Top 10 obchodov podľa tržieb
+```sql
 SELECT
   s.store_name,
   SUM(f.ss_net_paid) AS total_revenue
 FROM FACT_STORE_SALES f
 JOIN DIM_STORE s ON f.store_sk = s.store_sk
-GROUP BY 1
+GROUP BY s.store_name
 ORDER BY total_revenue DESC
 LIMIT 10;
+```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje 10 obchodov s najvyššími tržbami. Graf pomáha porovnávať výkonnosť predajní.
 
-
-
-Najaktívnejšie obchody podľa počtu transakcií za rok 2000:
-
+## Graf 3: Najaktívnejšie obchody podľa počtu transakcií (rok 2000)
+```sql
 SELECT
   s.store_name,
   COUNT(*) AS transactions_count
@@ -297,12 +300,11 @@ WHERE d.year = 2000
 GROUP BY s.store_name
 ORDER BY transactions_count DESC
 LIMIT 20;
+```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje najaktívnejšie predajne podľa počtu transakcií za rok 2000. Umožňuje sledovať aktivitu predajní bez ohľadu na výšku tržieb.
 
-
-
-
-Aktivita zákazníkov podľa roku narodenia:
-
+## Graf 4: Aktivita zákazníkov podľa roku narodenia
+```sql
 SELECT
   c.birth_year,
   COUNT(*) AS sales_count
@@ -310,12 +312,11 @@ FROM FACT_STORE_SALES f
 JOIN DIM_CUSTOMER c ON f.customer_sk = c.customer_sk
 GROUP BY c.birth_year
 ORDER BY c.birth_year;
+```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje počet nákupov podľa roku narodenia zákazníkov. Pomáha analyzovať, ktoré vekové skupiny sú najaktívnejšie.
 
-
-
-
-Priemerný počet položiek na transakciu podľa obchod a kategórie:
-
+## Graf 5: Priemerný počet položiek na transakciu podľa obchodu a kategórie
+```sql
 SELECT
   s.store_name,
   i.category,
@@ -325,12 +326,11 @@ JOIN DIM_STORE s ON f.store_sk = s.store_sk
 JOIN DIM_ITEM i  ON f.item_sk = i.item_sk
 GROUP BY s.store_name, i.category
 ORDER BY avg_items_per_sale DESC;
+```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje veľkosť nákupného košíka (priemerný počet kusov na transakciu) podľa obchodu a kategórie. Je vhodný na porovnanie nákupného správania medzi predajňami.
 
-
-
-TOP Kategórie v jednotlivých mestách podľa počtu transakcií:
-
-
+## Graf 6: Priemerný počet položiek na transakciu podľa obchodu a kategórie
+```sql
 SELECT
   s.city,
   i.category,
@@ -342,9 +342,8 @@ GROUP BY s.city, i.category
 ORDER BY transactions_count DESC
 LIMIT 50;
 ```
+Kód slúži na vytvorenie grafu, ktorý vizualizuje najčastejšie kombinácie mesto–kategória podľa počtu transakcií. Pomáha identifikovať regionálne preferencie produktov.
+
 ---
 ---
-
-
-## **Autor**
-**Doplň svoje meno a priezvisko**
+Autori:Lukáš Horvát,Marco Gunda
